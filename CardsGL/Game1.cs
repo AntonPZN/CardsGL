@@ -67,8 +67,8 @@ namespace CardsGL
 
         int winner;
 
-        Button throwOut;
-        Button takeTableDeck;
+        //Button throwOut;
+        //Button takeTableDeck;
 
         GameStates prevGameState;
 
@@ -108,8 +108,8 @@ namespace CardsGL
             gameMenu = new Menu(this);
             gameMenu.Update();
 
-            throwOut = new Button(this, 500, cardTable.Height / 2 - 120, 70, 134);
-            takeTableDeck = new Button(this, 500, cardTable.Height / 2 + 35, 70, 134);
+            //throwOut = new Button(this, 500, cardTable.Height / 2 - 120, 70, 134);
+            //takeTableDeck = new Button(this, 500, cardTable.Height / 2 + 35, 70, 134);
 
             //cardTable.CardSetup();
             //cardTable.UpdateTable();
@@ -226,8 +226,8 @@ namespace CardsGL
                                 cardTable.NextPlayer = 1;
                                 cardTable.CardSetup();
                                 cardTable.UpdateTable();
-                                throwOut.Enabled = true;
-                                takeTableDeck.Enabled = true;
+                                //throwOut.Enabled = true;
+                                //takeTableDeck.Enabled = true;
                                 state = GameStates.New; break;
 
                         case 3: Exit(); break;
@@ -246,8 +246,8 @@ namespace CardsGL
                         cardTable.TakeFromCardDeck();
                         cardTable.CurrentPlayer = 1;
                         cardTable.NextPlayer = 0;
-                        throwOut.Enabled = false;
-                        takeTableDeck.Enabled = true;
+                        //throwOut.Enabled = false;
+                        //takeTableDeck.Enabled = true;
                         state = GameStates.AITurn;
                     }
                     else
@@ -256,43 +256,43 @@ namespace CardsGL
                         {
                             cardTable.TakeDeck(0);
                             cardTable.TakeFromCardDeck();
-                            throwOut.Enabled = true;
-                            takeTableDeck.Enabled = false;
+                            //throwOut.Enabled = true;
+                            //takeTableDeck.Enabled = false;
                             state = GameStates.AITurn;
                         }
                     }
                 }
 
-                if (state == GameStates.Started)
-                {
-                    throwOut.GetSelected(mouseState);
-                    throwOut.Update();
+                //if (state == GameStates.Started)
+                //{
+                //    throwOut.GetSelected(mouseState);
+                //    throwOut.Update();
 
-                    if (mouseLeftButtonClick(mouseState))
-                    {
-                        if (throwOut.Selected)
-                        {
-                            cardTable.ThrowOut();
-                            cardTable.TakeFromCardDeck();
-                            cardTable.CurrentPlayer = 1;
-                            cardTable.NextPlayer = 0;
-                            state = GameStates.AITurn;
-                        }
-                    }
-                }
+                //    if (mouseLeftButtonClick(mouseState))
+                //    {
+                //        if (throwOut.Selected)
+                //        {
+                //            cardTable.ThrowOut();
+                //            cardTable.TakeFromCardDeck();
+                //            cardTable.CurrentPlayer = 1;
+                //            cardTable.NextPlayer = 0;
+                //            state = GameStates.AITurn;
+                //        }
+                //    }
+                //}
 
-                if (state == GameStates.PlayerTurn)
-                {
-                    takeTableDeck.GetSelected(mouseState);
-                    takeTableDeck.Update();
+                //if (state == GameStates.PlayerTurn)
+                //{
+                //    takeTableDeck.GetSelected(mouseState);
+                //    takeTableDeck.Update();
 
-                    if (mouseLeftButtonClick(mouseState) && takeTableDeck.Selected)
-                    {
-                        cardTable.TakeDeck(0);
-                        cardTable.TakeFromCardDeck();
-                        state = GameStates.AITurn;
-                    }
-                }
+                //    if (mouseLeftButtonClick(mouseState) && takeTableDeck.Selected)
+                //    {
+                //        cardTable.TakeDeck(0);
+                //        cardTable.TakeFromCardDeck();
+                //        state = GameStates.AITurn;
+                //    }
+                //}
 
                 if (kbState.IsKeyDown(Keys.T) && !previousState.IsKeyDown(Keys.T) && state == GameStates.Started)
                 {
@@ -349,8 +349,8 @@ namespace CardsGL
                             if (cardTable.GameRound() == 1)
                             {
                                 cardTable.TakeFromCardDeck();
-                                throwOut.Enabled = true;
-                                takeTableDeck.Enabled = true;
+                                //throwOut.Enabled = true;
+                                //takeTableDeck.Enabled = true;
                             }
 
                             state = GameStates.Started;
@@ -371,8 +371,8 @@ namespace CardsGL
                             cardTable.TakeFromCardDeck();
                             cardTable.CurrentPlayer = 0;
                             cardTable.NextPlayer = 1;
-                            throwOut.Enabled = false;
-                            takeTableDeck.Enabled = true;
+                            //throwOut.Enabled = false;
+                            //takeTableDeck.Enabled = true;
                         }
 
                         state = GameStates.PlayerTurn;
@@ -423,8 +423,8 @@ namespace CardsGL
 
 
             cardTable.Draw(spriteBatch, textureCommon, textureTarots, textureTable);
-            throwOut.Draw(spriteBatch,  textureButtonUp);
-            takeTableDeck.Draw(spriteBatch, textureButtonDown);
+            //throwOut.Draw(spriteBatch,  textureButtonUp);
+            //takeTableDeck.Draw(spriteBatch, textureButtonDown);
 
 
             if (state == GameStates.MainMenu)
