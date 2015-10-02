@@ -1,0 +1,15 @@
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\CardsGL.exe
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\CardsGL.pdb
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\MonoGame.Framework.dll
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\OpenTK.dll
+F:\Projects\Visual Studio\CardsGL\CardsGL\obj\x86\Debug\CardsGL.csprojResolveAssemblyReference.cache
+F:\Projects\Visual Studio\CardsGL\CardsGL\obj\x86\Debug\CardsGL.exe
+F:\Projects\Visual Studio\CardsGL\CardsGL\obj\x86\Debug\CardsGL.pdb
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\Sprites2.png
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\Sprites.png
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\Tarots.png
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\Table.png
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\Final.png
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\FingerUp.png
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\mainFont.xnb
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\FingerDown.png
