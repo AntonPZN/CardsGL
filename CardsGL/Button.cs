@@ -17,7 +17,7 @@ namespace CardsGL
         public Color ButtonColor { get; set; }
         public float Scale { get; set; }
 
-        public Button(Game1 game, int x, int y, int width, int height)
+        public Button(CardGame game, int x, int y, int width, int height)
         {
             this.Position = new Vector2(x, y);
             this.Scale = 1f;

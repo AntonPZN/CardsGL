@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CardsGL
 {
-    class Table
+    class Table : Sprite
     {
         public Player[] Players { get; set; }
         public List<Card> CardDeck { get; set; }
@@ -20,12 +20,9 @@ namespace CardsGL
 
         public CardColor Trump { get; set; }
 
-        public int Width { get; set; }
-        public int Height { get; set; }
-
-
-        public Table(int numberOfPlayers, int width, int height)
+        public Table(CardGame game, int numberOfPlayers, int width, int height)
             {
+                this.Game = game;
                 this.CurrentPlayer = 0;
                 this.NextPlayer = 1;
                 this.Width = width;
@@ -35,17 +32,17 @@ namespace CardsGL
 
                 switch (numberOfPlayers)
                 {
-                    case 2: Players[0] = new Player("Vasya", Alignment.Bottom);
-                            Players[1] = new Player("Petya", Alignment.Top); 
+                    case 2: Players[0] = new Player(this.Game, "Vasya", Alignment.Bottom);
+                            Players[1] = new Player(this.Game, "Petya", Alignment.Top); 
                             break;
-                    case 3: Players[0] = new Player("Vasya", Alignment.Bottom);
-                            Players[1] = new Player("Petya", Alignment.Lift);
-                            Players[2] = new Player("Fedya", Alignment.Right); 
+                    case 3: Players[0] = new Player(this.Game, "Vasya", Alignment.Bottom);
+                            Players[1] = new Player(this.Game, "Petya", Alignment.Lift);
+                            Players[2] = new Player(this.Game, "Fedya", Alignment.Right); 
                             break;
-                    case 4: Players[0] = new Player("Vasya", Alignment.Bottom);
-                            Players[1] = new Player("Petya", Alignment.Lift);
-                            Players[2] = new Player("Fedya", Alignment.Top); 
-                            Players[3] = new Player("Grisha", Alignment.Right); break;
+                    case 4: Players[0] = new Player(this.Game, "Vasya", Alignment.Bottom);
+                            Players[1] = new Player(this.Game, "Petya", Alignment.Lift);
+                            Players[2] = new Player(this.Game, "Fedya", Alignment.Top); 
+                            Players[3] = new Player(this.Game, "Grisha", Alignment.Right); break;
                     default: break;
                 }
 
@@ -67,11 +64,11 @@ namespace CardsGL
 
             List<Card> deck = new List<Card>();
 
-            for (int i = 0; i < Game1.CARD_SUIT_COUNT; i++)
+            for (int i = 0; i < this.Game.CARD_SUIT_COUNT; i++)
             {
-                for (int j = 4; j < Game1.NUMBER_OF_CARDS; j++)
+                for (int j = 4; j < this.Game.NUMBER_OF_CARDS; j++)
                 {
-                    deck.Add(new Card((CardColor)i, (CardValue)j));
+                    deck.Add(new Card(this.Game, (CardColor)i, (CardValue)j));
                 }
             }
 
@@ -80,13 +77,13 @@ namespace CardsGL
             int playerNumber = 0;
             Card currentCard;
 
-            for (int i = Game1.CARD_SUIT_COUNT * (Game1.NUMBER_OF_CARDS - 4); 0 < i; i--)
+            for (int i = this.Game.CARD_SUIT_COUNT * (this.Game.NUMBER_OF_CARDS - 4); 0 < i; i--)
             {
                 cardNumber = randomazer.Next(i);
 
                 currentCard = deck[cardNumber];
 
-                if (i <= Game1.CARDS_IN_HAND * Players.Length)
+                if (i <= this.Game.CARDS_IN_HAND * Players.Length)
                 {
                     //раздать игроку
                     playerNumber = playerNumber == Players.Length - 1 ? 0 : playerNumber + 1;
@@ -117,13 +114,13 @@ namespace CardsGL
             foreach (Card item in CardDeck)
             {
                 ii++;
-                item.PositionX = Width + Game1.CARD_HEIGHT / 2;
-                item.PositionY = Height - Game1.CARD_WIDTH * 2 + ii;
+                item.PositionX = Width + this.Game.CARD_HEIGHT / 2;
+                item.PositionY = Height - this.Game.CARD_WIDTH * 2 + ii;
                 item.Rotation = -(float)(Math.PI) / 2;
             }
 
-            CardDeck[0].PositionX = Width + Game1.CARD_WIDTH + Game1.BORDER_SIZE;
-            CardDeck[0].PositionY = Height - Game1.CARD_HEIGHT * 2;
+            CardDeck[0].PositionX = Width + this.Game.CARD_WIDTH + this.Game.BORDER_SIZE;
+            CardDeck[0].PositionY = Height - this.Game.CARD_HEIGHT * 2;
             CardDeck[0].Rotation = 0;
 
             this.Trump = CardDeck[0].CardColor;
@@ -138,7 +135,7 @@ namespace CardsGL
             this.TableDeck.Clear();
 
             Random rand = new Random();
-            int x = (this.Width + Game1.CARD_WIDTH), y = (Game1.CARD_HEIGHT - Game1.BORDER_SIZE * 2);
+            int x = (this.Width + this.Game.CARD_WIDTH), y = (this.Game.CARD_HEIGHT - this.Game.BORDER_SIZE * 2);
             Vector2 startPoint;
 
 
@@ -216,16 +213,36 @@ namespace CardsGL
             }
         }
 
+        /// <summary>
+        /// Check mouse click on cards on table
+        /// </summary>
+        /// <param name="ms">Mouse state.</param>
+
         public bool ClickOnTableDeck(MouseState ms)
         {
             bool result = false;
+            Rectangle cardHeap;
+
+            float x = this.Width, y = this.Height;
 
             foreach (Card item in this.TableDeck)
             {
-                if (item.GetRect.Contains(ms.Position))
+                if (item.PositionX < x)
                 {
-                    result = true;
+                    x = item.PositionX;
                 }
+
+                if (item.PositionY < y)
+                {
+                    y = item.PositionY;
+                }
+            }
+
+            cardHeap = new Rectangle((int)x, (int)y, this.Game.CARD_WIDTH * 2, this.Game.CARD_HEIGHT * 2);
+
+            if (cardHeap.Contains(ms.Position))
+            {
+                result = true;
             }
 
             return result;
@@ -331,7 +348,7 @@ namespace CardsGL
                 return;
             }
 
-            Card temp = new Card();
+            Card temp = new Card(this.Game);
             int curPlayer = this.NextPlayer;
 
             while (true)
@@ -364,7 +381,7 @@ namespace CardsGL
 
             Card currentPlCard = this.Players[0].MakeStep();
 
-            int x = (this.Width - Game1.CARD_WIDTH) / 2, y = (this.Height - Game1.CARD_HEIGHT) / 2, i = 0, count = 0;
+            int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2, i = 0, count = 0;
             Random rand = new Random();
             Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
 
@@ -387,7 +404,7 @@ namespace CardsGL
 
             Card currentPlCard = this.Players[0].MakeStep();
 
-            int x = (this.Width - Game1.CARD_WIDTH) / 2, y = (this.Height - Game1.CARD_HEIGHT) / 2, i = 0, count = 0;
+            int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2, i = 0, count = 0;
             Random rand = new Random();
             Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
 
@@ -429,7 +446,7 @@ namespace CardsGL
 
             if (currentPlCard.Empty != true)
             {
-                int x = (this.Width - Game1.CARD_WIDTH) / 2, y = (this.Height - Game1.CARD_HEIGHT) / 2, i = 0, count = 0;
+                int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2, i = 0, count = 0;
                 Random rand = new Random();
                 Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
 

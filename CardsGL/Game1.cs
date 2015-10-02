@@ -30,19 +30,19 @@ namespace CardsGL
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class CardGame : Game
     {
         //=====================================
-        public const int CARD_SUIT_COUNT = 4;
-        public const int NUMBER_OF_CARDS = 13;
-        public const int CARDS_IN_HAND = 6;
+        public readonly int CARD_SUIT_COUNT = 4;
+        public readonly int NUMBER_OF_CARDS = 13;
+        public readonly int CARDS_IN_HAND = 6;
 
-        public const int CARD_WIDTH = 60;
-        public const int CARD_HEIGHT = 83;
+        public readonly int CARD_WIDTH = 60;
+        public readonly int CARD_HEIGHT = 83;
 
-        public const int BORDER_SIZE = 10;
+        public readonly int BORDER_SIZE = 10;
 
-        public const int MAX_CARDS_IN_ROW = 12;
+        public readonly int MAX_CARDS_IN_ROW = 12;
         //=====================================
 
         public readonly string[] mainMenuItemNamesEng = { "Resume", "New Game", "Options", "Exit" };
@@ -85,7 +85,7 @@ namespace CardsGL
         public GameStates State { get { return state; } }
         public GameStates PrevGameState { get { return prevGameState; } }
 
-        public Game1()
+        public CardGame()
         {
             graphics = new GraphicsDeviceManager(this);
             IsMouseVisible = true;
@@ -103,7 +103,7 @@ namespace CardsGL
         {
             // TODO: Add your initialization logic here
 
-            cardTable = new Table(2, GraphicsDevice.Viewport.Width - 200, GraphicsDevice.Viewport.Height);
+            cardTable = new Table(this, 2, GraphicsDevice.Viewport.Width - 200, GraphicsDevice.Viewport.Height);
 
             gameMenu = new Menu(this);
             gameMenu.Update();

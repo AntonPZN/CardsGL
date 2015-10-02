@@ -26,7 +26,7 @@ namespace CardsGL
 
         public Rectangle GetRect { get { return new Rectangle((int)Position.X, (int)Position.Y, Width, Height); } }
 
-        public MenuItem(Game1 game, MainMenuItems type)
+        public MenuItem(CardGame game, MainMenuItems type)
         {
             this.Name = game.mainMenuItemNamesEng[(int)type];
             this.Type = type;
@@ -70,7 +70,7 @@ namespace CardsGL
         public string Name { get; set; }
         public List<MenuItem> Items { get; set; }
 
-        public Menu(Game1 game)
+        public Menu(CardGame game)
         {
             this.Game = game;
 

@@ -11,7 +11,7 @@ namespace CardsGL
     {
         private Vector2 position;
 
-        public Game1 Game { get; set; }
+        public CardGame Game { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public float Depth { get; set; }

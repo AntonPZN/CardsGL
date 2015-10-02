@@ -47,17 +47,20 @@ namespace CardsGL
 
         public Rectangle GetRect { get { return new Rectangle((int)Position.X, (int)Position.Y, Width, Height); } }
 
-        public Card()
+        public Card(CardGame game)
         {
+            this.Game = game;
             empty = true;
         }
 
-        public Card(CardColor aCardColor, CardValue aCardValue)
+        public Card(CardGame game, CardColor aCardColor, CardValue aCardValue)
         {
+            this.Game = game;
+
             CardColor = aCardColor;
             CardValue = aCardValue;
             empty = false;
-            Depth = 1 - ((int)this.CardColor * Game1.NUMBER_OF_CARDS + (int)this.CardValue + 1) / 100f;
+            Depth = 1 - ((int)this.CardColor * this.Game.NUMBER_OF_CARDS + (int)this.CardValue + 1) / 100f;
             Width = 60;
             Height = 83;
         }
@@ -67,7 +70,7 @@ namespace CardsGL
             CardColor = aCardColor;
             CardValue = aCardValue;
             empty = false;
-            Depth = 1 - ((int)this.CardColor * Game1.NUMBER_OF_CARDS + (int)this.CardValue + 1) / 100f;
+            Depth = 1 - ((int)this.CardColor * this.Game.NUMBER_OF_CARDS + (int)this.CardValue + 1) / 100f;
             Position = vect;
             Width = 60;
             Height = 83;
@@ -78,7 +81,7 @@ namespace CardsGL
             CardColor = aCardColor;
             CardValue = aCardValue;
             empty = false;
-            Depth = 1 - ((int)this.CardColor * Game1.NUMBER_OF_CARDS + (int)this.CardValue + 1) / 100f;
+            Depth = 1 - ((int)this.CardColor * this.Game.NUMBER_OF_CARDS + (int)this.CardValue + 1) / 100f;
             Position = new Vector2(x, y);
             Width = 60;
             Height = 83;
@@ -125,8 +128,8 @@ namespace CardsGL
 
         public int CompareTo(Card compareCard)
         {
-            if ((int)this.CardColor * Game1.NUMBER_OF_CARDS + (int)this.CardValue <
-                (int)compareCard.CardColor * Game1.NUMBER_OF_CARDS + (int)compareCard.CardValue)
+            if ((int)this.CardColor * this.Game.NUMBER_OF_CARDS + (int)this.CardValue <
+                (int)compareCard.CardColor * this.Game.NUMBER_OF_CARDS + (int)compareCard.CardValue)
                 return -1;
             else
                 return 1;

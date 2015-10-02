@@ -19,6 +19,8 @@ namespace CardsGL
 
     public class Player
     {
+        public CardGame Game { get; set; }
+
         public string Name { get; set; }
         public int Score { get; set; }
         public bool Status { get; set; }
@@ -28,8 +30,9 @@ namespace CardsGL
         public List<Card> CardDeck { get; set; }
         public Difficulty Difficulty { get; set; }
 
-        public Player()
+        public Player(CardGame game)
         {
+            this.Game = game;
             Name = "";
             Score = 0;
             Status = false;
@@ -39,8 +42,9 @@ namespace CardsGL
             Difficulty = CardsGL.Difficulty.Easy;
         }
 
-        public Player(string aName, Alignment alignment)
+        public Player(CardGame game, string aName, Alignment alignment)
         {
+            this.Game = game;
             Name = aName;
             Score = 0;
             Status = false;
@@ -59,38 +63,38 @@ namespace CardsGL
 
             int i = 0, j = 0, rows = 0;
 
-            rows = this.CardDeck.Count % Game1.MAX_CARDS_IN_ROW == 0 ? this.CardDeck.Count / Game1.MAX_CARDS_IN_ROW - 1 : this.CardDeck.Count / Game1.MAX_CARDS_IN_ROW;
+            rows = this.CardDeck.Count % this.Game.MAX_CARDS_IN_ROW == 0 ? this.CardDeck.Count / this.Game.MAX_CARDS_IN_ROW - 1 : this.CardDeck.Count / this.Game.MAX_CARDS_IN_ROW;
 
             if (this.Alignment == CardsGL.Alignment.Bottom)
             {
-                xDelta = Game1.CARD_WIDTH / 2;
-                yDelta = Game1.CARD_HEIGHT / 2;
+                xDelta = this.Game.CARD_WIDTH / 2;
+                yDelta = this.Game.CARD_HEIGHT / 2;
             }
             else
             {
-                xDelta = Game1.CARD_WIDTH / 4;
-                yDelta = Game1.CARD_HEIGHT / 4;
+                xDelta = this.Game.CARD_WIDTH / 4;
+                yDelta = this.Game.CARD_HEIGHT / 4;
             }
 
-            xMax = (width - Game1.CARD_WIDTH - (Game1.MAX_CARDS_IN_ROW - 1) * xDelta) / 2;
-            yMax = (height - Game1.CARD_HEIGHT - (Game1.MAX_CARDS_IN_ROW - 1) * yDelta) / 2;
+            xMax = (width - this.Game.CARD_WIDTH - (this.Game.MAX_CARDS_IN_ROW - 1) * xDelta) / 2;
+            yMax = (height - this.Game.CARD_HEIGHT - (this.Game.MAX_CARDS_IN_ROW - 1) * yDelta) / 2;
 
             switch (this.Alignment)
             {
-                case Alignment.Bottom:  x = (width - Game1.CARD_WIDTH - (this.CardDeck.Count - rows * Game1.MAX_CARDS_IN_ROW - 1) * xDelta) / 2;
-                                        y = height - Game1.CARD_HEIGHT - Game1.BORDER_SIZE - yDelta * rows;
+                case Alignment.Bottom: x = (width - this.Game.CARD_WIDTH - (this.CardDeck.Count - rows * this.Game.MAX_CARDS_IN_ROW - 1) * xDelta) / 2;
+                                        y = height - this.Game.CARD_HEIGHT - this.Game.BORDER_SIZE - yDelta * rows;
 
                                         foreach (Card item in this.CardDeck)
                                                 {
                                                     if (j == rows)
-                                                        item.PositionX = x + xDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionX = x + xDelta * (i % this.Game.MAX_CARDS_IN_ROW);
                                                     else
-                                                        item.PositionX = xMax + xDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionX = xMax + xDelta * (i % this.Game.MAX_CARDS_IN_ROW);
 
                                                     item.PositionY = y + yDelta * j;
                                                     i++;
 
-                                                    if (i % Game1.MAX_CARDS_IN_ROW == 0)
+                                                    if (i % this.Game.MAX_CARDS_IN_ROW == 0)
                                                        j++;
 
                                                     item.Rotation = 0f;
@@ -99,21 +103,21 @@ namespace CardsGL
 
                                                 }  break;
 
-                case Alignment.Lift:    x = Game1.BORDER_SIZE;
-                                        y = (height - Game1.CARD_HEIGHT - (this.CardDeck.Count - rows * Game1.MAX_CARDS_IN_ROW - 1) * yDelta) / 2;
+                case Alignment.Lift:    x = this.Game.BORDER_SIZE;
+                                        y = (height - this.Game.CARD_HEIGHT - (this.CardDeck.Count - rows * this.Game.MAX_CARDS_IN_ROW - 1) * yDelta) / 2;
                                         
                                         foreach (Card item in this.CardDeck)
                                                 {
                                                     item.PositionX = x + xDelta * j;
 
                                                     if (j == rows)
-                                                        item.PositionY = y + yDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionY = y + yDelta * (i % this.Game.MAX_CARDS_IN_ROW);
                                                     else
-                                                        item.PositionY = yMax + yDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionY = yMax + yDelta * (i % this.Game.MAX_CARDS_IN_ROW);
 
                                                     i++;
 
-                                                    if (i % Game1.MAX_CARDS_IN_ROW == 0)
+                                                    if (i % this.Game.MAX_CARDS_IN_ROW == 0)
                                                         j++;
 
                                                     item.Rotation = 0f;
@@ -122,21 +126,21 @@ namespace CardsGL
 
                                                 } break;
 
-                case Alignment.Right:   x = width - Game1.CARD_WIDTH - Game1.BORDER_SIZE - xDelta * rows;
-                                        y = (height - Game1.CARD_HEIGHT - (this.CardDeck.Count - rows * Game1.MAX_CARDS_IN_ROW - 1) * yDelta) / 2;
+                case Alignment.Right:   x = width - this.Game.CARD_WIDTH - this.Game.BORDER_SIZE - xDelta * rows;
+                                        y = (height - this.Game.CARD_HEIGHT - (this.CardDeck.Count - rows * this.Game.MAX_CARDS_IN_ROW - 1) * yDelta) / 2;
                                         
                                         foreach (Card item in this.CardDeck)
                                                 {
                                                     item.PositionX = x + xDelta * j;
 
                                                     if (j == rows)
-                                                        item.PositionY = y + yDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionY = y + yDelta * (i % this.Game.MAX_CARDS_IN_ROW);
                                                     else
-                                                        item.PositionY = yMax + yDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionY = yMax + yDelta * (i % this.Game.MAX_CARDS_IN_ROW);
 
                                                     i++;
 
-                                                    if (i % Game1.MAX_CARDS_IN_ROW == 0)
+                                                    if (i % this.Game.MAX_CARDS_IN_ROW == 0)
                                                         j++;
 
                                                     item.Rotation = 0f;
@@ -145,19 +149,19 @@ namespace CardsGL
 
                                                 } break;
 
-                case Alignment.Top:     x = (width - Game1.CARD_WIDTH - (this.CardDeck.Count - rows * Game1.MAX_CARDS_IN_ROW - 1) * xDelta) / 2;
-                                        y = Game1.BORDER_SIZE;
+                case Alignment.Top:     x = (width - this.Game.CARD_WIDTH - (this.CardDeck.Count - rows * this.Game.MAX_CARDS_IN_ROW - 1) * xDelta) / 2;
+                                        y = this.Game.BORDER_SIZE;
                                         foreach (Card item in this.CardDeck)
                                                 {
                                                     if (j == rows)
-                                                        item.PositionX = x + xDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionX = x + xDelta * (i % this.Game.MAX_CARDS_IN_ROW);
                                                     else
-                                                        item.PositionX = xMax + xDelta * (i % Game1.MAX_CARDS_IN_ROW);
+                                                        item.PositionX = xMax + xDelta * (i % this.Game.MAX_CARDS_IN_ROW);
 
                                                     item.PositionY = y + yDelta * j;
                                                     i++;
 
-                                                    if (i % Game1.MAX_CARDS_IN_ROW == 0)
+                                                    if (i % this.Game.MAX_CARDS_IN_ROW == 0)
                                                         j++;
 
                                                     item.Rotation = 0f;
@@ -171,7 +175,7 @@ namespace CardsGL
 
         public Card MakeStep()
         {
-            Card temp = new Card();
+            Card temp = new Card(this.Game);
 
             foreach (Card item in this.CardDeck)
 	            {
@@ -189,7 +193,7 @@ namespace CardsGL
 
         public Card GetCard(List<Card> deck)
         {
-            Card temp = new Card();
+            Card temp = new Card(this.Game);
             Random rand = new Random();
 
             if (this.CardDeck.Count > 0)
@@ -225,7 +229,7 @@ namespace CardsGL
 
         public Card BeatCard(Card card, CardColor trump)
         {
-            Card temp = new Card();
+            Card temp = new Card(this.Game);
 
             foreach (Card item in this.CardDeck)
             {
