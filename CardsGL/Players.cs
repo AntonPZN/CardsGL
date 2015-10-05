@@ -173,7 +173,7 @@ namespace CardsGL
             }
         }
 
-        public Card MakeStep()
+        public Card ThrowCard()
         {
             Card temp = new Card(this.Game);
 
@@ -223,6 +223,37 @@ namespace CardsGL
                 this.CardDeck.Remove(temp);
 
             }
+
+            return temp;
+        }
+
+        public List<Card> GetTossingCards(List<Card> deck, int maxCount)
+        {
+            List<Card> temp = new List<Card>();
+            Random rand = new Random();
+
+            foreach (Card item in deck)
+            {
+                foreach (Card card in this.CardDeck)
+                {
+                    if (item.CardValue == card.CardValue && !temp.Contains(card))
+                    {
+                        temp.Add(card);
+                    }
+                }
+
+                //temp.Add(item);
+            }
+
+            foreach (Card item in temp)
+            {
+                if (this.CardDeck.Contains(item))
+                {
+                    this.CardDeck.Remove(item);
+                }
+            }
+
+            //this.CardDeck.Clear();
 
             return temp;
         }

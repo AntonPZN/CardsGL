@@ -20,10 +20,14 @@ namespace CardsGL
         New = 0,
         MainMenu,
         VideoMenu,
-        Started,
+        //Started,
 
         PlayerTurn,
+        PlayerBeat,
+        PlayerTake,
         AITurn,
+        AIBeat,
+        AITake,
         End
     }
 
@@ -56,6 +60,7 @@ namespace CardsGL
         Texture2D textureTarots;
         Texture2D textureTable;
         Texture2D textureEpic;
+        public Texture2D textureSuits;
         Texture2D textureButtonUp;
         Texture2D textureButtonDown;
 
@@ -142,6 +147,7 @@ namespace CardsGL
             textureEpic = Content.Load<Texture2D>("Images/Final.png");
             textureButtonUp = Content.Load<Texture2D>("Images/FingerUp.png");
             textureButtonDown = Content.Load<Texture2D>("Images/FingerDown.png");
+            textureSuits = Content.Load<Texture2D>("Images/Suits.png");
 
             mainFont = Content.Load<SpriteFont>("mainFont");
         }
@@ -180,37 +186,36 @@ namespace CardsGL
         {
             KeyboardState kbState = Keyboard.GetState();
             MouseState mouseState = Mouse.GetState();
-            
+
             if (mouseLeftButtonClick(mouseState) && state == GameStates.End)
             {
-                cardTable.CurrentPlayer = 0;
-                cardTable.NextPlayer = 1;
-                cardTable.CardSetup();
-                cardTable.UpdateTable();
-                winner = -1;
-                state = GameStates.New;
-            }
-
-            if (kbButtonPressed(Keys.Escape, kbState) && state == GameStates.MainMenu)
-            {
-                state = prevGameState;
-            }
-            else
-            {
-                if (kbButtonPressed(Keys.Escape, kbState) && state != GameStates.MainMenu)
+                cardTable.NewGame();
+                if (cardTable.CurrentPlayer == 0)
                 {
                     prevGameState = state;
-                    state = GameStates.MainMenu;
+                    state = GameStates.PlayerTurn;
                 }
+                else
+                {
+                    prevGameState = state;
+                    state = GameStates.AITurn;
+                }
+                winner = -1;
+                //state = GameStates.New;
             }
-
-            if (kbButtonPressed(Keys.Q, kbState) && state == GameStates.MainMenu)
-                Exit();
 
             // TODO: Add your update logic here
 
             if (state == GameStates.MainMenu)
             {
+                if (kbButtonPressed(Keys.Escape, kbState))
+                {
+                    state = prevGameState;
+                }
+
+                if (kbButtonPressed(Keys.Q, kbState))
+                    Exit();
+
                 //state = GameStates.MainMenu;
                 //prevGameState = GameStates.Started;
                 //gameMenu.Update();
@@ -222,13 +227,18 @@ namespace CardsGL
                     {
                         case 0: state = prevGameState; break;
 
-                        case 1: cardTable.CurrentPlayer = 0;
-                                cardTable.NextPlayer = 1;
-                                cardTable.CardSetup();
-                                cardTable.UpdateTable();
-                                //throwOut.Enabled = true;
-                                //takeTableDeck.Enabled = true;
-                                state = GameStates.New; break;
+                        case 1: cardTable.NewGame();
+                                if (cardTable.CurrentPlayer == 0)
+                                {
+                                    prevGameState = state;
+                                    state = GameStates.PlayerTurn;
+                                }
+                                else
+                                {
+                                    prevGameState = state;
+                                    state = GameStates.AITurn;
+                                }
+                                /*state = GameStates.New;*/ break;
 
                         case 3: Exit(); break;
                         default: break;
@@ -238,83 +248,177 @@ namespace CardsGL
             }
             else
             {
+                if (kbButtonPressed(Keys.Escape, kbState) && state != GameStates.MainMenu)
+                {
+                    prevGameState = state;
+                    state = GameStates.MainMenu;
+                }
+
                 if (mouseLeftButtonClick(mouseState) && cardTable.ClickOnTableDeck(mouseState))
                 {
-                    if (state == GameStates.Started)
+                    switch (state)
                     {
-                        cardTable.ThrowOut();
-                        cardTable.TakeFromCardDeck();
-                        cardTable.CurrentPlayer = 1;
-                        cardTable.NextPlayer = 0;
-                        //throwOut.Enabled = false;
-                        //takeTableDeck.Enabled = true;
+                        case GameStates.PlayerTurn: cardTable.EndRound(0);
+                                                    prevGameState = state;
+                                                    state = GameStates.AITurn;
+                                                    break;
+                        case GameStates.PlayerBeat: prevGameState = state; 
+                                                    state = GameStates.PlayerTake;
+                                                    break;
+
+                        case GameStates.PlayerTake: cardTable.EndRound(1);
+                                                    prevGameState = state;
+                                                    state = GameStates.AITurn; 
+                                                    break;
+
+                        case GameStates.AITake: cardTable.EndRound(1);
+                                                prevGameState = state;
+                                                state = GameStates.PlayerTurn;
+                                                break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                if (kbState.IsKeyDown(Keys.T) && !previousState.IsKeyDown(Keys.T) && state == GameStates.PlayerTurn)
+                {
+                    cardTable.EndRound(0);
+                    prevGameState = state;
+                    state = GameStates.AITurn;
+                }
+
+                if (kbState.IsKeyDown(Keys.G) && !previousState.IsKeyDown(Keys.G) && state == GameStates.PlayerBeat)
+                {
+                    cardTable.EndRound(1);
+                    prevGameState = state;
+                    state = GameStates.AITurn;
+                }
+                //===========================================
+
+                if (state == GameStates.PlayerTurn)
+                {
+                    cardTable.GetCurrentCard(mouseState);
+
+                    if (mouseLeftButtonClick(mouseState) && cardTable.IsCardChosen() && cardTable.GameRound() == 1)
+                    {
+                        prevGameState = state;
+                        state = GameStates.AIBeat;
+                    }
+                }
+
+                if (state == GameStates.PlayerBeat)
+                {
+                    cardTable.GetBeatCard(mouseState);
+
+                    if (mouseLeftButtonClick(mouseState) && cardTable.IsCardChosen() && cardTable.PlayerBeatCard() == 1)
+                    {
+                        prevGameState = state;
                         state = GameStates.AITurn;
+                    }
+                }
+
+                if (state == GameStates.AITurn)
+                {
+                    if (cardTable.GameRound() == 0)
+                    {
+                        cardTable.EndRound(0);
+                        prevGameState = state;
+                        state = GameStates.PlayerTurn;
                     }
                     else
                     {
-                        if (state == GameStates.PlayerTurn)
-                        {
-                            cardTable.TakeDeck(0);
-                            cardTable.TakeFromCardDeck();
-                            //throwOut.Enabled = true;
-                            //takeTableDeck.Enabled = false;
-                            state = GameStates.AITurn;
-                        }
+                        prevGameState = state;
+                        state = GameStates.PlayerBeat;
                     }
                 }
 
-                //if (state == GameStates.Started)
+                if (state == GameStates.AIBeat)
+                {
+                    if (cardTable.AIBeatCard() == 0)
+                    {
+                        prevGameState = state;
+                        state = GameStates.AITake;
+                    }
+                    else
+                    {
+                        prevGameState = state;
+                        state = GameStates.PlayerTurn;
+                    }
+                    
+                }
+
+                if (state == GameStates.PlayerTake && prevGameState == GameStates.PlayerBeat)
+                {
+                    if (cardTable.TossCard() == 0)
+                    {
+                        cardTable.EndRound(1);
+                        prevGameState = state;
+                        state = GameStates.AITurn;
+                    }
+                }
+
+                if (state == GameStates.AITake)
+                {
+                    cardTable.GetCurrentCard(mouseState);
+
+                    if (mouseLeftButtonClick(mouseState) && cardTable.IsCardChosen() && cardTable.GameRound() == 1)
+                    {
+
+                    }
+                }
+                //if (state == GameStates.PlayerTurn)
+                ////if (cardTable.CurrentPlayer == 0)
                 //{
-                //    throwOut.GetSelected(mouseState);
-                //    throwOut.Update();
+                //    cardTable.GetCurrentCard(mouseState);
 
                 //    if (mouseLeftButtonClick(mouseState))
                 //    {
-                //        if (throwOut.Selected)
+                //        if (cardTable.IsCardChosen())
                 //        {
-                //            cardTable.ThrowOut();
-                //            cardTable.TakeFromCardDeck();
-                //            cardTable.CurrentPlayer = 1;
-                //            cardTable.NextPlayer = 0;
-                //            state = GameStates.AITurn;
+                //            if (cardTable.GameRound() == 1)
+                //            {
+                //                cardTable.EndRound(1);
+                //            }
+
+                //            //state = GameStates.PlayerTurn;
                 //        }
                 //    }
                 //}
-
-                //if (state == GameStates.PlayerTurn)
+                //else
                 //{
-                //    takeTableDeck.GetSelected(mouseState);
-                //    takeTableDeck.Update();
-
-                //    if (mouseLeftButtonClick(mouseState) && takeTableDeck.Selected)
+                //    if (state == GameStates.AITurn)
                 //    {
-                //        cardTable.TakeDeck(0);
-                //        cardTable.TakeFromCardDeck();
-                //        state = GameStates.AITurn;
+                //        if (cardTable.GameRound2() == 0)
+                //        {
+                //            cardTable.EndRound(0);
+                //        }
+
+                //        state = GameStates.PlayerBeat;
                 //    }
                 //}
 
-                if (kbState.IsKeyDown(Keys.T) && !previousState.IsKeyDown(Keys.T) && state == GameStates.Started)
-                {
-                    cardTable.ThrowOut();
-                    cardTable.TakeFromCardDeck();
-                    cardTable.CurrentPlayer = 1;
-                    cardTable.NextPlayer = 0;
-                    state = GameStates.AITurn;
-                }
-
-                if (kbState.IsKeyDown(Keys.G) && !previousState.IsKeyDown(Keys.G) && state == GameStates.PlayerTurn)
-                {
-                    cardTable.TakeDeck(0);
-                    cardTable.TakeFromCardDeck();
-                    state = GameStates.AITurn;
-                }
-
-
-                //if (kbState.IsKeyDown(Keys.N) && !previousState.IsKeyDown(Keys.N) && state == GameStates.Started)
+                ////if (cardTable.NextPlayer == 0)
+                //if (state == GameStates.PlayerBeat)
                 //{
-                //    cardTable.NextPlayer = cardTable.NextPlayer == 3 ? 0 : cardTable.NextPlayer + 1;
+                //    cardTable.GetBeatCard(mouseState);
+
+                //    // Recognize a single click of the left mouse button
+                //    if (mouseLeftButtonClick(mouseState) && state == GameStates.PlayerBeat)
+                //    {
+                //        if (cardTable.IsCardChosen())
+                //        {
+                //            if (cardTable.MakeStep() == 1)
+                //            {
+                //                state = GameStates.AITurn;
+                //            }
+                //        }
+                //    }
                 //}
+                //=============================================================================
+
+
+
 
                 if (cardTable.TableDeck.Count == 0 && (cardTable.Players[0].CardDeck.Count == 0 || cardTable.Players[1].CardDeck.Count == 0) && state != GameStates.MainMenu)
                 {
@@ -330,81 +434,11 @@ namespace CardsGL
                     state = GameStates.End;
                 }
 
-                if (cardTable.CurrentPlayer == 0)
-                {
-                    if (state == GameStates.PlayerTurn)
-                    {
-                        cardTable.GetCurrentCard(mouseState);
-                    }
-                    else
-                    {
-                        cardTable.GetCurrentCard(mouseState);
-                    }
 
-                    // Recognize a single click of the left mouse button
-                    if (mouseLeftButtonClick(mouseState))
-                    {
-                        if (cardTable.IsCardChosen())
-                        {
-                            if (cardTable.GameRound() == 1)
-                            {
-                                cardTable.TakeFromCardDeck();
-                                //throwOut.Enabled = true;
-                                //takeTableDeck.Enabled = true;
-                            }
-
-                            state = GameStates.Started;
-                            //System.Threading.Thread.Sleep(1000);
-                            //cardTable.CurrentPlayer = cardTable.CurrentPlayer == 3 ? 0 : cardTable.CurrentPlayer + 1;
-                        }
-
-                        clickOccurred = true;
-                    }
-                }
-                else
-                {
-                    if (state == GameStates.AITurn)
-                    {
-                        if (cardTable.GameRound2() == 0)
-                        {
-                            cardTable.ThrowOut();
-                            cardTable.TakeFromCardDeck();
-                            cardTable.CurrentPlayer = 0;
-                            cardTable.NextPlayer = 1;
-                            //throwOut.Enabled = false;
-                            //takeTableDeck.Enabled = true;
-                        }
-
-                        state = GameStates.PlayerTurn;
-                    }
-                }
-
-                if (cardTable.NextPlayer == 0)
-                {
-                    cardTable.GetBeatCard(mouseState);
-
-                    // Recognize a single click of the left mouse button
-                    if (mouseLeftButtonClick(mouseState) && state == GameStates.PlayerTurn)
-                    {
-                        if (cardTable.IsCardChosen())
-                        {
-                            if (cardTable.MakeStep() == 1)
-                            {
-                                state = GameStates.AITurn;
-                                //cardTable.TakeFromCardDeck();
-                            }
-
-                            //state = GameStates.Started;
-                            //System.Threading.Thread.Sleep(1000);
-                            //cardTable.CurrentPlayer = cardTable.CurrentPlayer == 3 ? 0 : cardTable.CurrentPlayer + 1;
-                        }
-
-                        clickOccurred = true;
-                    }
-                }
             }
             previousMouseState = mouseState;
             previousState = kbState;
+            //prevGameState = prevGameState != state ? state : prevGameState;
 
             base.Update(gameTime);
         }

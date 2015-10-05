@@ -13,3 +13,4 @@ F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\Fin
 F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\FingerUp.png
 F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\mainFont.xnb
 F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\FingerDown.png
+F:\Projects\Visual Studio\CardsGL\CardsGL\bin\WindowsGL\Debug\Content\Images\Suits.png

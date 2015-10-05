@@ -126,6 +126,16 @@ namespace CardsGL
             this.Trump = CardDeck[0].CardColor;
         }
 
+        public void NewGame()
+        {
+            Random rand = new Random();
+
+            this.CurrentPlayer = rand.Next(this.Players.Length);
+            this.NextPlayer = this.CurrentPlayer == Players.Length - 1 ? 0 : this.CurrentPlayer + 1; ;
+            this.CardSetup();
+            this.UpdateTable();
+        }
+
         public void ThrowOut()
         {
             foreach (var item in this.TableDeck)
@@ -372,81 +382,27 @@ namespace CardsGL
             UpdateTable();
         }
 
-        public int MakeStep()
-        {
-            if (Players[0].CardDeck.Count == 0)
-            {
-                return -1;
-            }
-
-            Card currentPlCard = this.Players[0].MakeStep();
-
-            int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2, i = 0, count = 0;
-            Random rand = new Random();
-            Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
-
-            currentPlCard.Position = new Vector2(x - startPoint.X, y + startPoint.Y);
-            currentPlCard.Rotation = (float)Math.PI / rand.Next(7, 15);
-
-            TableDeck.Add(currentPlCard);
-
-            UpdateTable();
-
-            return 1;
-        }
-
         public int GameRound()
         {
+            Card currentPlCard;
+
             if (Players[this.NextPlayer].CardDeck.Count == 0 || Players[this.CurrentPlayer].CardDeck.Count == 0)
             {
                 return -1;
             }
 
-            Card currentPlCard = this.Players[0].MakeStep();
-
-            int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2, i = 0, count = 0;
-            Random rand = new Random();
-            Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
-
-            currentPlCard.Position = new Vector2(x - startPoint.X, y + startPoint.Y);
-            currentPlCard.Rotation = -(float)Math.PI / rand.Next(7, 15);
-
-            TableDeck.Add(currentPlCard);
-
-            //Card nextPlCard = Players[this.NextPlayer].GetCard();
-
-            Card nextPlCard = Players[this.NextPlayer].BeatCard(currentPlCard, Trump);
-
-            if (nextPlCard.Empty == true)
+            if (this.CurrentPlayer == 0)
             {
-                this.TakeDeck(this.NextPlayer);
-                return 1;
+                currentPlCard = this.Players[this.CurrentPlayer].ThrowCard();
             }
             else
             {
-                nextPlCard.Position = new Vector2(x + startPoint.X, y + startPoint.Y);
-                nextPlCard.Rotation = (float)Math.PI / rand.Next(7, 15);
-
-                TableDeck.Add(nextPlCard);
-
+                currentPlCard = this.Players[CurrentPlayer].GetCard(TableDeck);
             }
-            UpdateTable();
-
-            return 0;
-        }
-
-        public int GameRound2()
-        {
-            if (Players[this.NextPlayer].CardDeck.Count == 0 || Players[this.CurrentPlayer].CardDeck.Count == 0)
-            {
-                return -1;
-            }
-
-            Card currentPlCard = this.Players[CurrentPlayer].GetCard(TableDeck);
 
             if (currentPlCard.Empty != true)
             {
-                int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2, i = 0, count = 0;
+                int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2;
                 Random rand = new Random();
                 Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
 
@@ -463,6 +419,112 @@ namespace CardsGL
             UpdateTable();
 
             return 1;
+        }
+
+        public int TossCard()
+        {
+            int maxTossed;
+            List<Card> tossingCard = new List<Card>();
+            int i = 0, x = 0, y = 0;
+
+            if (Players[this.NextPlayer].CardDeck.Count == 0 || Players[this.CurrentPlayer].CardDeck.Count == 0)
+            {
+                return -1;
+            }
+
+            maxTossed = Players[this.NextPlayer].CardDeck.Count;
+
+            tossingCard = this.Players[this.CurrentPlayer].GetTossingCards(TableDeck, maxTossed);
+
+            if (tossingCard.Count != 0)
+            {
+                foreach (Card item in tossingCard)
+                {
+                    x = (this.Width - this.Game.CARD_WIDTH) / 2;
+                    y = (this.Height - this.Game.CARD_HEIGHT * tossingCard.Count) / 2;
+                    i++;
+                    item.Position = new Vector2(x + this.Width / 4, y + i * this.Game.CARD_HEIGHT / 2);
+
+                    TableDeck.Add(item);
+                }
+            }
+            else
+            {
+                return 0;
+            }
+
+            UpdateTable();
+
+            return 1;
+        }
+
+        public int AIBeatCard()
+        {
+            //if (Players[this.NextPlayer].CardDeck.Count == 0 || Players[this.CurrentPlayer].CardDeck.Count == 0)
+            //{
+            //    return -1;
+            //}
+
+            Card nextPlCard = Players[this.NextPlayer].BeatCard(TableDeck[TableDeck.Count - 1], this.Trump);
+
+            if (nextPlCard.Empty != true)
+            {
+                int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2;
+                Random rand = new Random();
+                Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
+
+                nextPlCard.Position = new Vector2(x + startPoint.X, y + startPoint.Y);
+                nextPlCard.Rotation = (float)Math.PI / rand.Next(7, 15);
+
+                TableDeck.Add(nextPlCard);
+            }
+            else
+            {
+                return 0;
+            }
+
+            UpdateTable();
+
+            return 1;
+        }
+
+        public int PlayerBeatCard()
+        {
+            if (Players[0].CardDeck.Count == 0)
+            {
+                return -1;
+            }
+
+            Card currentPlCard = this.Players[0].ThrowCard();
+
+            int x = (this.Width - this.Game.CARD_WIDTH) / 2, y = (this.Height - this.Game.CARD_HEIGHT) / 2;
+            Random rand = new Random();
+            Vector2 startPoint = new Vector2(rand.Next(10, 20), rand.Next(-30, 30));
+
+            currentPlCard.Position = new Vector2(x - startPoint.X, y + startPoint.Y);
+            currentPlCard.Rotation = (float)Math.PI / rand.Next(7, 15);
+
+            TableDeck.Add(currentPlCard);
+
+            UpdateTable();
+
+            return 1;
+        }
+
+        public void EndRound(int mode)
+        {
+            if (mode == 0)
+            {
+                this.ThrowOut();
+                this.TakeFromCardDeck();
+                this.CurrentPlayer = this.CurrentPlayer == Players.Length - 1 ? 0 : this.CurrentPlayer + 1;
+                this.NextPlayer = this.NextPlayer == Players.Length - 1 ? 0 : this.NextPlayer + 1;
+            }
+            else
+            {
+                this.TakeDeck(this.NextPlayer);
+                this.TakeFromCardDeck();
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, Texture2D textureCard, Texture2D textureTarot, Texture2D textureTable)
@@ -488,14 +550,24 @@ namespace CardsGL
             if (CardDeck.Count != 0)
             {
                 CardDeck[0].Draw(spriteBatch, textureCard, true);
-            }
 
-            foreach (Card item in CardDeck)
-            {
-                if (item != CardDeck[0])
+                foreach (Card item in CardDeck)
                 {
-                     item.Draw(spriteBatch, textureTarot, false);
+                    if (item != CardDeck[0])
+                    {
+                        item.Draw(spriteBatch, textureTarot, false);
+                    }
                 }
+            }
+            else
+            {
+                var effects2 = SpriteEffects.None;
+                var origin2 = new Vector2(0, 0);
+                var p2 = new Vector2(Width + this.Game.CARD_HEIGHT / 2, Height - this.Game.CARD_HEIGHT * 2);
+                Rectangle currentRectangle2 = new Rectangle(240 * (int)this.Trump, 0, 240, 270);
+
+                spriteBatch.Draw(Game.textureSuits, p2, currentRectangle2, Color.White, 0f, origin2, 0.5f, effects2, 0.85f);
+                //Draw tramp color
             }
 
             foreach (var item in OutDeck)
