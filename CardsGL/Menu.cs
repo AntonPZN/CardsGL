@@ -120,10 +120,7 @@ namespace CardsGL
         {
             foreach (MenuItem item in Items)
             {
-                if (item.Enable == false)
-                    continue;
-
-                if (item.GetRect.Contains(ms.Position))
+                if (item.GetRect.Contains(ms.Position) && item.Enable == true)
                 {
                     item.Selected = true;
                 }
