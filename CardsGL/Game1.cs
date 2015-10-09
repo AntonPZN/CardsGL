@@ -59,8 +59,9 @@ namespace CardsGL
         Texture2D textureCommon;
         Texture2D textureTarots;
         Texture2D textureTable;
-        Texture2D textureEpic;
+        //Texture2D textureEpic;
         public Texture2D textureSuits;
+        Texture2D textureEndGame;
         Texture2D textureButtonUp;
         Texture2D textureButtonDown;
 
@@ -70,7 +71,13 @@ namespace CardsGL
         KeyboardState previousState;
 
 
-        int winner;
+
+        //test ===
+
+        public bool showEnemyCards = false;
+        InputTextContainer cheat;
+
+        //
 
         //Button throwOut;
         //Button takeTableDeck;
@@ -84,6 +91,8 @@ namespace CardsGL
 
         Table cardTable;
         Menu gameMenu;
+
+        EventHandler<TextInputEventArgs> onTextEntered; //event fot keyboard input
 
         //=================================================
 
@@ -108,6 +117,13 @@ namespace CardsGL
         {
             // TODO: Add your initialization logic here
 
+            #if OpenGL
+                Window.TextInput += TextEntered;
+                onTextEntered += HandleInput;
+            #else
+                Window.TextInput += HandleInput;
+            #endif
+
             cardTable = new Table(this, 2, GraphicsDevice.Viewport.Width - 200, GraphicsDevice.Viewport.Height);
 
             gameMenu = new Menu(this);
@@ -126,10 +142,23 @@ namespace CardsGL
             state = GameStates.MainMenu;
             prevGameState = GameStates.MainMenu;
 
-            winner = -1;
+            cheat = new InputTextContainer();
 
             base.Initialize();
         }
+
+        private void TextEntered(object sender, TextInputEventArgs e)
+        {
+            if (onTextEntered != null)
+                onTextEntered.Invoke(sender, e);
+        }
+
+        private void HandleInput(object sender, TextInputEventArgs e)
+        {
+            cheat.PutChar(e.Character);
+            // Do stuff here
+        }
+
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
@@ -141,13 +170,14 @@ namespace CardsGL
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            textureCommon = Content.Load<Texture2D>("Images/Sprites.png");
-            textureTarots = Content.Load<Texture2D>("Images/Tarots.png");
-            textureTable = Content.Load<Texture2D>("Images/Table.png");
-            textureEpic = Content.Load<Texture2D>("Images/Final.png");
-            textureButtonUp = Content.Load<Texture2D>("Images/FingerUp.png");
-            textureButtonDown = Content.Load<Texture2D>("Images/FingerDown.png");
-            textureSuits = Content.Load<Texture2D>("Images/Suits.png");
+            textureCommon = Content.Load<Texture2D>("Images/Sprites");
+            textureTarots = Content.Load<Texture2D>("Images/Tarots");
+            textureTable = Content.Load<Texture2D>("Images/Table");
+            textureButtonUp = Content.Load<Texture2D>("Images/FingerUp");
+            textureButtonDown = Content.Load<Texture2D>("Images/FingerDown");
+            textureSuits = Content.Load<Texture2D>("Images/Suits");
+
+            textureEndGame = Content.Load<Texture2D>("Images/Endgame");
 
             mainFont = Content.Load<SpriteFont>("mainFont");
         }
@@ -177,6 +207,15 @@ namespace CardsGL
             return kbState.IsKeyDown(key) && !previousState.IsKeyDown(key);
         }
 
+        private void cheating()
+        {
+            if (cheat.Contains("showcards"))
+                showEnemyCards = true;
+            else if (cheat.Contains("reset"))
+                showEnemyCards = false;
+        }
+
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -186,7 +225,11 @@ namespace CardsGL
         {
             KeyboardState kbState = Keyboard.GetState();
             MouseState mouseState = Mouse.GetState();
+            //=====================
 
+            this.cheating();
+
+            //=====================
             if (mouseLeftButtonClick(mouseState) && state == GameStates.End)
             {
                 cardTable.NewGame();
@@ -200,7 +243,6 @@ namespace CardsGL
                     prevGameState = state;
                     state = GameStates.AITurn;
                 }
-                winner = -1;
                 //state = GameStates.New;
             }
 
@@ -259,6 +301,7 @@ namespace CardsGL
                     switch (state)
                     {
                         case GameStates.PlayerTurn: cardTable.EndRound(0);
+                                                    this.cardTable.CheckWinner();
                                                     prevGameState = state;
                                                     state = GameStates.AITurn;
                                                     break;
@@ -267,11 +310,13 @@ namespace CardsGL
                                                     break;
 
                         case GameStates.PlayerTake: cardTable.EndRound(1);
+                                                    this.cardTable.CheckWinner();
                                                     prevGameState = state;
                                                     state = GameStates.AITurn; 
                                                     break;
 
                         case GameStates.AITake: cardTable.EndRound(1);
+                                                this.cardTable.CheckWinner();
                                                 prevGameState = state;
                                                 state = GameStates.PlayerTurn;
                                                 break;
@@ -281,19 +326,21 @@ namespace CardsGL
                     }
                 }
 
-                if (kbState.IsKeyDown(Keys.T) && !previousState.IsKeyDown(Keys.T) && state == GameStates.PlayerTurn)
-                {
-                    cardTable.EndRound(0);
-                    prevGameState = state;
-                    state = GameStates.AITurn;
-                }
+                //if (kbState.IsKeyDown(Keys.T) && !previousState.IsKeyDown(Keys.T) && state == GameStates.PlayerTurn)
+                //{
+                //    cardTable.EndRound(0);
+                //    this.cardTable.CheckWinner();
+                //    prevGameState = state;
+                //    state = GameStates.AITurn;
+                //}
 
-                if (kbState.IsKeyDown(Keys.G) && !previousState.IsKeyDown(Keys.G) && state == GameStates.PlayerBeat)
-                {
-                    cardTable.EndRound(1);
-                    prevGameState = state;
-                    state = GameStates.AITurn;
-                }
+                //if (kbState.IsKeyDown(Keys.G) && !previousState.IsKeyDown(Keys.G) && state == GameStates.PlayerBeat)
+                //{
+                //    cardTable.EndRound(1);
+                //    this.cardTable.CheckWinner();
+                //    prevGameState = state;
+                //    state = GameStates.AITurn;
+                //}
                 //===========================================
 
                 if (state == GameStates.PlayerTurn)
@@ -320,16 +367,18 @@ namespace CardsGL
 
                 if (state == GameStates.AITurn)
                 {
-                    if (cardTable.GameRound() == 0)
-                    {
-                        cardTable.EndRound(0);
-                        prevGameState = state;
-                        state = GameStates.PlayerTurn;
-                    }
-                    else
+                    if (cardTable.GameRound() == 1)
                     {
                         prevGameState = state;
                         state = GameStates.PlayerBeat;
+
+                    }
+                    else
+                    {
+                        cardTable.EndRound(0);
+                        this.cardTable.CheckWinner();
+                        prevGameState = state;
+                        state = GameStates.PlayerTurn;
                     }
                 }
 
@@ -353,6 +402,7 @@ namespace CardsGL
                     if (cardTable.TossCard() == 0)
                     {
                         cardTable.EndRound(1);
+                        this.cardTable.CheckWinner();
                         prevGameState = state;
                         state = GameStates.AITurn;
                     }
@@ -362,9 +412,9 @@ namespace CardsGL
                 {
                     cardTable.GetCurrentCard(mouseState);
 
-                    if (mouseLeftButtonClick(mouseState) && cardTable.IsCardChosen() && cardTable.GameRound() == 1)
+                    if (mouseLeftButtonClick(mouseState) && cardTable.IsCardChosen())
                     {
-
+                        cardTable.GameRound();
                     }
                 }
                 //if (state == GameStates.PlayerTurn)
@@ -420,20 +470,24 @@ namespace CardsGL
 
 
 
-                if (cardTable.TableDeck.Count == 0 && (cardTable.Players[0].CardDeck.Count == 0 || cardTable.Players[1].CardDeck.Count == 0) && state != GameStates.MainMenu)
-                {
-                    if (cardTable.Players[0].CardDeck.Count == 0)
-                    {
-                        winner = 0;
-                    }
-                    else
-                    {
-                        winner = 1;
-                    }
+                //if (cardTable.TableDeck.Count == 0 && (cardTable.Players[0].CardDeck.Count == 0 || cardTable.Players[1].CardDeck.Count == 0) && state != GameStates.MainMenu)
+                //{
+                //    if (cardTable.Players[0].CardDeck.Count == 0)
+                //    {
+                //        winner = 0;
+                //    }
+                //    else
+                //    {
+                //        winner = 1;
+                //    }
 
+                //    state = GameStates.End;
+                //}
+
+                if (this.cardTable.GameResult != GameResult.None)
+                {
                     state = GameStates.End;
                 }
-
 
             }
             previousMouseState = mouseState;
@@ -473,9 +527,9 @@ namespace CardsGL
                 var origin = new Vector2(150, 100);
                 //var origin = new Vector2(0, 0);
                 var p = new Vector2(cardTable.Width / 2, cardTable.Height / 2);
-                Rectangle currentRectangle = new Rectangle(300 * winner, 0, 300, 200);
+                Rectangle currentRectangle = new Rectangle(300 * (int)this.cardTable.GameResult, 0, 300, 200);
 
-                spriteBatch.Draw(textureEpic, p, currentRectangle, Color.White, 0f, origin, 1f, effects, 0f);
+                spriteBatch.Draw(textureEndGame, p, currentRectangle, Color.White, 0f, origin, 1f, effects, 0f);
             }
 
             spriteBatch.End();

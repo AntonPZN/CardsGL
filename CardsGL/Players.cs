@@ -296,11 +296,11 @@ namespace CardsGL
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Texture2D texture, bool showCards)
+        public void Draw(SpriteBatch spriteBatch, Texture2D textureCard, Texture2D textureTarot, bool showCards)
         {
             foreach (Card item in this.CardDeck)
             {
-                item.Draw(spriteBatch, texture, showCards);
+                item.Draw(spriteBatch, textureCard, textureTarot, showCards);
             }
         }
     }

@@ -5,5 +5,12 @@
   <Config />
   <SourceFiles>
     <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/mainFont.spritefont</File>
+    <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/Images/Endgame.png</File>
+    <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/Images/Sprites.png</File>
+    <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/Images/Suits.png</File>
+    <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/Images/Table.png</File>
+    <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/Images/Tarots.png</File>
+    <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/Images/FingerDown.png</File>
+    <File>F:/Projects/Visual Studio/CardsGL/CardsGL/Content/Images/FingerUp.png</File>
   </SourceFiles>
 </SourceFileCollection>

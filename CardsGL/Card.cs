@@ -153,10 +153,10 @@ namespace CardsGL
         //        return this.CardValue.CompareTo(compareCard.CardValue);
         //}
 
-        public void Draw(SpriteBatch spriteBatch, Texture2D texture, bool showCards)
+        public void Draw(SpriteBatch spriteBatch, Texture2D textureCard, Texture2D textureTarot, bool showCards)
         {
+            Texture2D texture;
             SpriteEffects effects = SpriteEffects.None;
-            //var origin = new Vector2(this.Width / 2, this.Height / 2);
             Vector2 origin = new Vector2();
             Vector2 p   = new Vector2();
             Rectangle currentRectangle;
@@ -175,10 +175,12 @@ namespace CardsGL
             if (showCards)
             {
                 currentRectangle = new Rectangle((int)this.CardValue * (this.Width + 1), (int)this.CardColor * (this.Height + 1), this.Width, this.Height);
+                texture = textureCard;
             }
             else
             {
                 currentRectangle = new Rectangle((this.Width + 1) * 2, 0, this.Width, this.Height);
+                texture = textureTarot;
             }
 
             if (this.Current)

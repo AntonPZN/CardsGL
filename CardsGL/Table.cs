@@ -9,6 +9,14 @@ using System.Text;
 
 namespace CardsGL
 {
+    public enum GameResult
+    {
+        None = -1,
+        Draw = 0,
+        Win,
+        Lose
+   }
+
     class Table : Sprite
     {
         public Player[] Players { get; set; }
@@ -20,6 +28,8 @@ namespace CardsGL
 
         public CardColor Trump { get; set; }
 
+        public GameResult GameResult { get; set; }
+
         public Table(CardGame game, int numberOfPlayers, int width, int height)
             {
                 this.Game = game;
@@ -27,6 +37,7 @@ namespace CardsGL
                 this.NextPlayer = 1;
                 this.Width = width;
                 this.Height = height;
+                this.GameResult = GameResult.None;
 
                 this.Players = new Player[numberOfPlayers];
 
@@ -131,9 +142,39 @@ namespace CardsGL
             Random rand = new Random();
 
             this.CurrentPlayer = rand.Next(this.Players.Length);
-            this.NextPlayer = this.CurrentPlayer == Players.Length - 1 ? 0 : this.CurrentPlayer + 1; ;
+            this.NextPlayer = this.CurrentPlayer == Players.Length - 1 ? 0 : this.CurrentPlayer + 1;
+            this.GameResult = GameResult.None;
             this.CardSetup();
             this.UpdateTable();
+        }
+
+        public void CheckWinner()
+        {
+            int winner = -1;
+
+            if (this.CardDeck.Count != 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < this.Players.Length; i++)
+            {
+                if (this.Players[i].CardDeck.Count == 0)
+                {
+                    if (winner == -1)
+                        winner = i;
+                    else
+                        winner = -2;
+                }
+            }
+
+            switch (winner)
+            {
+                case -2: this.GameResult = GameResult.Draw; break;
+                case -1: this.GameResult = GameResult.None; break;
+                case 0: this.GameResult = CardsGL.GameResult.Win; break;
+                default: this.GameResult = CardsGL.GameResult.Lose; break;
+            }
         }
 
         public void ThrowOut()
@@ -533,29 +574,29 @@ namespace CardsGL
             {
                 if (item.Alignment == Alignment.Bottom)
                 {
-                    item.Draw(spriteBatch, textureCard, true);
+                    item.Draw(spriteBatch, textureCard, textureTarot, true);
                 }
                 else
                 {
-                    item.Draw(spriteBatch, textureTarot, false);
+                    item.Draw(spriteBatch, textureCard, textureTarot, this.Game.showEnemyCards);
                     //item.Draw(spriteBatch, textureCard, true);
                 }
             }
 
             foreach (Card item in TableDeck)
             {
-                item.Draw(spriteBatch, textureCard, true);
+                item.Draw(spriteBatch, textureCard, textureTarot, true);
             }
 
             if (CardDeck.Count != 0)
             {
-                CardDeck[0].Draw(spriteBatch, textureCard, true);
+                CardDeck[0].Draw(spriteBatch, textureCard, textureTarot, true);
 
                 foreach (Card item in CardDeck)
                 {
                     if (item != CardDeck[0])
                     {
-                        item.Draw(spriteBatch, textureTarot, false);
+                        item.Draw(spriteBatch, textureCard, textureTarot, this.Game.showEnemyCards);
                     }
                 }
             }
@@ -572,7 +613,7 @@ namespace CardsGL
 
             foreach (var item in OutDeck)
             {
-                item.Draw(spriteBatch, textureTarot, false);
+                item.Draw(spriteBatch, textureTarot, textureTarot, false);
             }
 
             var effects = SpriteEffects.None;
